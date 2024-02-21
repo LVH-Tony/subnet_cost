@@ -21,9 +21,9 @@ logging.basicConfig(
 
 # Forecasted alert times
 forecasted_times = {
-    363: datetime(2024, 2, 20, 10, 16, 51),
-    300: datetime(2024, 2, 20, 21, 11, 42),
-    200: datetime(2024, 2, 21, 14, 31, 9),
+    363: datetime(2024, 2, 22, 10, 55, 7),
+    300: datetime(2024, 2, 22, 19, 7, 2),
+    200: datetime(2024, 2, 23, 8, 7, 50),
 }
 
 
@@ -133,7 +133,7 @@ def monitor():
         alerted_for = alerted_for.union(forecasted_alerted_for)
 
         logging.info("Sleeping for 5 minutes...")
-        time.sleep(300)  # Sleep for 5 minutes before checking again
+        time.sleep(600)
 
 
 if __name__ == "__main__":
