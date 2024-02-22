@@ -21,9 +21,9 @@ logging.basicConfig(
 
 # Forecasted alert times
 forecasted_times = {
-    363: datetime(2024, 2, 22, 10, 55, 7),
-    300: datetime(2024, 2, 22, 19, 7, 2),
-    200: datetime(2024, 2, 23, 8, 7, 50),
+    559: datetime(2024, 2, 23, 12, 57, 21),
+    400: datetime(2024, 2, 24, 5, 13, 26),
+    300: datetime(2024, 2, 24, 15, 27, 19),
 }
 
 
@@ -92,7 +92,8 @@ def monitor():
     forecasted_alerted_for = (
         set()
     )  # Keep track of the forecasted alerts that have been sent
-
+    last_cost = None
+    
     while True:
         now = datetime.now()
         cost = get_subnet_lock_cost()
@@ -101,6 +102,19 @@ def monitor():
         if cost is not None:
             cost_data = {"time": now, "cost": cost}
             write_to_json_file(cost_data)
+            
+            # Check for price jump
+            if last_cost is not None and cost > last_cost:
+                price_jump = cost - last_cost
+                # Define your threshold for what you consider a significant jump, e.g., τ10
+                if price_jump >= 10:  # Threshold for alerting a price jump
+                    send_email_alert(
+                        cost,
+                        last_cost,
+                        f"Significant price jump detected: from τ{last_cost} to τ{cost}."
+                    )
+
+            last_cost = cost  # Update the last checked cost for the next iteration
 
         # Check against forecasted alert times
         for threshold, alert_time in forecasted_times.items():
@@ -114,7 +128,7 @@ def monitor():
 
         # Check against dynamic price thresholds
         if cost is not None:
-            for threshold in [363, 300, 200]:
+            for threshold in [550, 400, 300]:
                 if cost <= threshold and threshold not in alerted_for:
                     send_email_alert(
                         cost,
